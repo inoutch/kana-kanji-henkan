@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/kana-henkan.iml" filepath="$PROJECT_DIR$/.idea/modules/kana-henkan.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/kana-henkan_main.iml" filepath="$PROJECT_DIR$/.idea/modules/kana-henkan_main.iml" group="kana-henkan" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/kana-henkan_test.iml" filepath="$PROJECT_DIR$/.idea/modules/kana-henkan_test.iml" group="kana-henkan" />
+    </modules>
+  </component>
+</project>
