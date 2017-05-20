@@ -1,60 +1,53 @@
 package analyzer;
 
 import analyzer.node.WordCost;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.TreeMultimap;
+import lombok.RequiredArgsConstructor;
+import lombok.Value;
 
-import java.sql.SQLException;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@RequiredArgsConstructor
+@Value
 public class SyntaxAnalyzer {
-    private final CorpusCostManager corpusCostManager = new CorpusCostManager();
+    private final CorpusCostManager corpusCostManager;
 
     public SyntaxAnalysisResult convert(String text) {
-        try {
-            corpusCostManager.open();
 
-            ArrayList<WordCost> words = new ArrayList<>();
-            Integer currentWordStringPoint = 0;
-            List<String> strings = Arrays
-                    .stream(text.split(""))
-                    .filter(x -> !Objects.equals(x, ""))
-                    .collect(Collectors.toList());
+        ArrayList<WordCost> words = new ArrayList<>();
+        Integer currentWordStringPoint = 0;
+        List<String> strings = CorpusCostManager.sparateCharacters(text);
 
-            while (currentWordStringPoint < strings.size()) {
-                Integer currentStringPoint = 0;
-                StringBuilder stringBuilder = new StringBuilder();
-                Map<Double, WordCost> costTreeMap = new TreeMap<>();
+        while (currentWordStringPoint < strings.size()) {
+            Integer currentStringPoint = 0;
+            StringBuilder stringBuilder = new StringBuilder();
+            Multimap<Double, WordCost> costTreeMap = TreeMultimap.create(Double::compare, (x1, x2) -> x1.getKana().compareTo(x2.getKana()));
 
-                while (currentWordStringPoint + currentStringPoint < strings.size()) {
-                    stringBuilder.append(strings.get(currentWordStringPoint + currentStringPoint));
-                    String currentWord = stringBuilder.toString();
+            while (currentWordStringPoint + currentStringPoint < strings.size()) {
+                stringBuilder.append(strings.get(currentWordStringPoint + currentStringPoint));
+                String currentWord = stringBuilder.toString();
 
-                    List<WordCost> list = corpusCostManager.findAllByKana(currentWord);
-                    costTreeMap.putAll(list.stream().collect(
-                            Collectors.toMap(x -> calculateCost(words, x), x -> x, (x1, x2) -> x1)));
+                List<WordCost> list = corpusCostManager.findAllByKana(currentWord);
+                list.forEach(x -> costTreeMap.put(calculateCost(words, x), x));
 
-                    if (list.size() == 0 && !corpusCostManager.isExistMatchedPartWord(currentWord)) {
-                        break;
-                    }
-                    currentStringPoint++;
+                if (list.size() == 0 && !corpusCostManager.isExistPartialMatchWord(currentWord)) {
+                    break;
                 }
-
-                List<WordCost> list = costTreeMap.values().stream().collect(Collectors.toList());
-                if (list.size() == 0) {
-                    continue;
-                }
-
-                words.add(list.get(0));
-                currentWordStringPoint += list.get(0).getKana().length();
+                currentStringPoint++;
             }
 
-            corpusCostManager.close();
-            return new SyntaxAnalysisResult(words);
+            List<WordCost> list = costTreeMap.values().stream().collect(Collectors.toList());
+            if (list.size() == 0) {
+                continue;
+            }
 
-        } catch (ClassNotFoundException | SQLException e) {
-            e.printStackTrace();
-            return null;
+            words.add(list.get(0));
+            currentWordStringPoint += list.get(0).getKana().length();
         }
+
+        return new SyntaxAnalysisResult(words);
     }
 
     private Double calculateCost(final List<WordCost> wordHistories, WordCost wordCost) {

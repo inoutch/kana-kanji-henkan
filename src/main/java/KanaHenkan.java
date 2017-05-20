@@ -2,23 +2,17 @@ import analyzer.CorpusCostManager;
 import analyzer.SyntaxAnalysisResult;
 import analyzer.SyntaxAnalyzer;
 
-import java.io.IOException;
-import java.sql.SQLException;
-
 public class KanaHenkan {
     public static void main(String args[]) {
-        /*CorpusCostManager corpusCostManager = new CorpusCostManager();
-        try {
-            corpusCostManager.create("tangoCost_ver2_utf8.csv");
-        } catch (ClassNotFoundException | SQLException | IOException e) {
-            e.printStackTrace();
-        }*/
         String testText = "こんにちは、あなたはなにものですか";
-        SyntaxAnalyzer analyzer = new SyntaxAnalyzer();
 
         try {
+            CorpusCostManager corpusCostManager = new CorpusCostManager("tangoCost_ver2_s_utf8.csv");
+            SyntaxAnalyzer analyzer = new SyntaxAnalyzer(corpusCostManager);
             SyntaxAnalysisResult result = analyzer.convert(testText);
-            System.out.println(result.toString());
+
+            System.out.println("入力: " + testText);
+            System.out.println("出力: " + result.toString());
 
         } catch (Exception e) {
             e.printStackTrace();
