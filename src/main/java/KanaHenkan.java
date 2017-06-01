@@ -8,12 +8,13 @@ public class KanaHenkan {
 
     public static void main(String args[]) {
         try {
-            System.out.print("Please enter kana text: ");
-            Scanner scanner = new Scanner(System.in);
-            String input = scanner.nextLine();
+            //System.out.print("Please enter kana text: ");
+            //Scanner scanner = new Scanner(System.in);
+            //String input = "こんにちは、きょうはいいてんきですね";//scanner.nextLine();
+            String input = "あしたもはれるといいですね";//scanner.nextLine();
 
             System.out.println("--- Loading corpus ---");
-            CorpusCostManager corpusCostManager = new CorpusCostManager("tangoCost_ver2_s_utf8.csv");
+            CorpusCostManager corpusCostManager = new CorpusCostManager("costTable_utf8.csv");
 
 
             SyntaxAnalyzer analyzer = new SyntaxAnalyzer(corpusCostManager);

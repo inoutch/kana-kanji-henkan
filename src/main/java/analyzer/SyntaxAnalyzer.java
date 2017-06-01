@@ -1,5 +1,6 @@
 package analyzer;
 
+import analyzer.node.PartsOfSpeech;
 import analyzer.node.WordCost;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.TreeMultimap;
@@ -43,6 +44,7 @@ public class SyntaxAnalyzer {
                 continue;
             }
 
+            System.out.println(list);
             words.add(list.get(0));
             currentWordStringPoint += list.get(0).getKana().length();
         }
@@ -51,6 +53,54 @@ public class SyntaxAnalyzer {
     }
 
     private Double calculateCost(final List<WordCost> wordHistories, WordCost wordCost) {
-        return wordCost.getCost();
+        PartsOfSpeech partsOfSpeech;
+        if (wordHistories.size() == 0) {
+            partsOfSpeech = PartsOfSpeech.PERIOD;
+        } else {
+            WordCost previous = wordHistories.get(wordHistories.size() - 1);
+            partsOfSpeech = previous.getPartsOfSpeech();
+        }
+
+        Double addition = 1.0 - wordCost.getKana().length() * 0.1;
+        Double hCost = 9.0;
+
+        switch (partsOfSpeech) {
+            case NOUN:
+                hCost = wordCost.getNoun();
+                break;
+            case ADJECTIVE:
+                hCost = wordCost.getAdjective();
+                break;
+            case VERB:
+                hCost = wordCost.getVerb();
+                break;
+            case ADVERB:
+                hCost =  wordCost.getAdverb();
+                break;
+            case CONJUCTION:
+                hCost = wordCost.getConjuction();
+                break;
+            case INTERJECTION:
+                hCost = wordCost.getInterjection();
+                break;
+            case PARTICLE:
+                hCost = wordCost.getParticle();
+                break;
+            case PRENOUN_ADJECTIVAL:
+                hCost = wordCost.getAdjective();
+                break;
+            case AUXILIARY_VERB:
+                hCost = wordCost.getAuxiliaryVerb();
+                break;
+            case PREFIX:
+                hCost = wordCost.getPrefix();
+                break;
+            case PERIOD:
+                hCost = wordCost.getPeriod();
+                break;
+            default:
+                break;
+        }
+        return addition * hCost + wordCost.getCost();
     }
 }

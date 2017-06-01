@@ -21,7 +21,8 @@ public enum PartsOfSpeech {
     PREFIX(12, "接頭詞"),
     FILER(13, "フィラー"),
     OTHER(14, "その他"),
-    UNDEFINED(15, "未定義");
+    UNDEFINED(15, "未定義"),
+    PERIOD(16, "句点");
 
     private final Integer code;
     private final String displayName;

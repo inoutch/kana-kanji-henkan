@@ -29,8 +29,31 @@ public class CorpusCostManager {
                 String word = values.get(0);
                 String kana = values.get(1);
                 Double cost = Double.parseDouble(values.get(3));
-                PartsOfSpeech partsOfSpeech = PartsOfSpeech.get(values.get(5));
-                wordCosts.add(new WordCost(word, kana, partsOfSpeech, cost));
+                PartsOfSpeech partsOfSpeech = PartsOfSpeech.get(values.get(16));
+
+                Double prenounAdjectival = Double.parseDouble(values.get(5));
+                Double noun = Double.parseDouble(values.get(6));
+                Double adverb = Double.parseDouble(values.get(7));
+                Double verb = Double.parseDouble(values.get(8));
+                Double prefix = Double.parseDouble(values.get(9));
+                Double conjuction = Double.parseDouble(values.get(10));
+                Double auxiliaryVerb = Double.parseDouble(values.get(11));
+                Double particle = Double.parseDouble(values.get(12));
+                Double adjective = Double.parseDouble(values.get(13));
+                Double period = Double.parseDouble(values.get(14));
+                Double interjection = Double.parseDouble(values.get(15));
+                wordCosts.add(new WordCost(word, kana, partsOfSpeech, cost,
+                        prenounAdjectival,
+                        noun,
+                        adverb,
+                        verb,
+                        prefix,
+                        conjuction,
+                        auxiliaryVerb,
+                        particle,
+                        adjective,
+                        period,
+                        interjection));
             } catch (RuntimeException e) {
                 //e.printStackTrace();
                 System.out.println("Ignored to parse the line of csv: " + values);
@@ -51,22 +74,20 @@ public class CorpusCostManager {
 
     private Pair<Integer, Integer> getIndexRange(String targetWord) {
         Integer index = indexes.get(getFirstCharacter(targetWord));
-        Integer first = null, end = wordCosts.size();
+        Integer first = null;
         for (Integer i = index; i < wordCosts.size(); i++) {
             WordCost wordCost = wordCosts.get(i);
             if (first == null) {
-                if (wordCost.getKana().equals(targetWord)) {
+                if (targetWord.equals(wordCost.getKana())) {
                     first = i;
+                } else if (wordCost.getKana().startsWith(targetWord)) {
+                    return new Pair<>(i - 1, i - 1);
                 }
-            } else if (!wordCost.getKana().equals(targetWord)) {
-                end = i;
-                break;
+            } else if (!targetWord.equals(wordCost.getKana())) {
+                return new Pair<>(first, i);
             }
         }
-        if (first == null) {
-            return new Pair<>(-1, -1);
-        }
-        return new Pair<>(first, end);
+        return new Pair<>(-1, -1);
     }
 
     public List<WordCost> findAllByKana(String word) {
